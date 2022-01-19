@@ -5,129 +5,38 @@ import java.util.List;
 
 
 public class Squad {
-    private String squadName;
-    private String cause;
-    private static boolean isRegisteredHero = false;
-    private List<Hero> heroMembers = new ArrayList<>();
-    private static List<Squad> squadList = new ArrayList<>();
     private int squadId;
-    private boolean isSquadFull = false;
+    private String squadName;
+    private int squadSize;
+    private String cause;
+    private ArrayList<Hero>  squadMembers = new ArrayList<>();
+    private static ArrayList<Squad> instances = new ArrayList<>();
 
-    public Squad(String name, String cause, Hero hero) {
-        this.squadName = name.trim();
-        this.cause = cause.trim();
-        crossCheckHero(hero.getHeroID());
 
-        if (isRegisteredHero) {
-            hero.setSquadAlliance(squadName);
-            heroMembers.add(hero);
-            squadList.add(this);
-            this.squadId = squadList.size();
-        } else {
-            System.out.println("HERO ISN'T REGISTERED");
-        }
+    public Squad(String name, int size, String cause ){
+        squadName = name;
+        squadSize = size;
+        this.cause = cause;
+        this.squadMembers = new ArrayList<>();
+        instances.add(this);
+        this.squadId = instances.size();
+
     }
-
-    public String getName() {
-        return squadName;
+    public int getSquadId(){return squadId;}
+    public static Squad findBySquadId(int id) {return instances.get(id-1);}
+    public String getSquadName() {return squadName;}
+    public int getSize() {return squadSize;}
+    public String getCause() {return this.cause;}
+    public static ArrayList<Squad> getInstances(){return instances;}
+    public ArrayList<Hero> getSquadMembers(){
+        return squadMembers;
     }
-
-    public int getSquadId() {
-        return squadId;
+    public void setSquadMembers(Hero newMember) {
+        squadMembers.add(newMember);
     }
+    public static void clearAllSquads(){ instances.clear(); }
+    public void clearAllSquadMembers(){ getSquadMembers().clear(); }
 
-    public void addMembers(Hero hero) {
-        if (heroMembers.size() >= 3) {
-            isSquadFull = true;
-        } else {
-            heroMembers.add(hero);
-        }
-    }
-
-    public boolean getSquadFull() {
-        return isSquadFull;
-    }
-
-    public List<Hero> getMembers() {
-        return heroMembers;
-    }
-
-    public String getCause() {
-        return cause;
-    }
-
-    public void changeHeroSquad(Hero hero, Squad newSquad) {
-        if (heroMembers.size() >= 3) {
-            isSquadFull = true;
-        } else {
-            Squad currentSquad = null;
-            for (Squad squad : squadList) {
-                if (hero.getSquadAlliance().equalsIgnoreCase(squad.squadName)) {
-                    currentSquad = squad;
-                    break;
-                }
-            }
-
-            for (Squad squad : squadList) {
-                if (newSquad.squadName.equalsIgnoreCase(squad.squadName)) {
-                    if (!hero.getSquadAlliance().equalsIgnoreCase("")) {
-                        //IF HERO EXISTED IN PREVIOUS SQUAD
-                        //noinspection ConstantConditions
-                        currentSquad.heroMembers.remove(hero);
-                        newSquad.heroMembers.add(hero);
-                        hero.updateSquad(newSquad.squadName);
-                        break;
-                    } else {
-                        //IF HERO HAD NO ALLIANCE
-                        newSquad.heroMembers.add(hero);
-                        hero.setSquadAlliance(newSquad.squadName);
-                    }
-                } else {
-                    System.out.println("Squad Doesn't exist");
-                }
-            }
-        }
-    }
-
-    public void removeMember(Hero hero) {
-        if (isSquadFull) {
-            isSquadFull = false;
-        }
-        hero.updateSquad("");
-        heroMembers.remove(hero);
-
-        if (heroMembers.isEmpty()) {
-            selfDelete();
-        }
-    }
-
-    public void clearMemberLists() {
-        heroMembers.clear();
-    }
-
-    public static List<Squad> getAllSquads() {
-        return squadList;
-    }
-
-    public static void clearSquadList() {
-        squadList.clear();
-    }
-
-    public static Squad findSquad(int searchId) {
-        return squadList.get(searchId - 1);
-    }
-
-    private void selfDelete() {
-        Squad.squadList.remove(this);
-    }
-
-    private static void crossCheckHero(int idToCheck) {
-        for (Hero hero : Hero.getHeroRegistry()) {
-            if (hero.getHeroID() == idToCheck) {
-                isRegisteredHero = true;
-                break;
-            }
-        }
-    }
-
+    public static Squad setUpNewSquad(){return new Squad("Captain Marvel",5,"Saving mother earth");}
+    public static Squad setUpNewSquad1(){return new Squad("The crew",5,"fighting crime");}
 }
